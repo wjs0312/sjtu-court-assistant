@@ -1,0 +1,78 @@
+[browser]
+# 交互运行时会询问浏览器；此处仅作为直接回车时的默认值。
+# Edge/Chrome 使用 chromium 引擎；Firefox/WebKit 首次使用前需安装对应 Playwright 浏览器。
+headless = false
+slow_mo_ms = 0
+timezone = "Asia/Shanghai"
+channel = "msedge"
+
+[schedule]
+release_time = "12:00:00"
+days_ahead = 7
+open_early_seconds = 300
+refresh_at_release = true
+detail_ready_timeout_ms = 15000
+refresh_navigation_timeout_ms = 5000
+deadline_seconds = 45
+retry_interval_ms = 400
+post_release_refresh_interval_ms = 800
+post_release_max_refreshes = 30
+
+[target]
+venue = "羽毛球馆"
+court = "1号场"
+time_slot = "21:00-22:00"
+time_slot_priority = ["21:00-22:00", "20:00-21:00", "19:00-20:00"]
+court_priority = ["场地1", "场地2", "场地3"]
+
+[site]
+login_url = "https://example.edu/login"
+booking_url = "https://example.edu/booking"
+detail_url = "https://example.edu/pc/#/apointmentDetails/1/venue-id/%25E7%25BE%25BD%25E6%25AF%259B%25E7%2590%2583/0"
+# 程序会自动在父目录下按浏览器隔离，例如 .auth/edge/state.json。
+auth_state = ".auth/state.json"
+session_storage = ".auth/session_storage.json"
+
+# 支付成功判定，至少配置一种。匹配任意一项即停止。
+[success]
+url_contains = "/pay"
+selector = ""
+text = "待支付"
+stop_after_submit = false
+open_payment_after_submit = false
+
+# 登录时用于判断“已登录”的页面元素；首次可留空，手动确认。
+[login]
+success_selector = ""
+timeout_seconds = 180
+captcha_selector = "input[placeholder*='验证码'], input[aria-label*='验证码']"
+auto_click_text = "校内人员登录"
+
+# 放场前执行：使用固定链接预热详情页；到点才刷新实时场次。
+[[prepare_steps]]
+action = "sjtu_open_detail"
+description = "直达目标详情页并确认会话有效"
+timeout_ms = 30000
+
+# 下列均为示例，必须根据学校页面修改选择器。
+# 支持 action: goto, click, fill, select, check, wait, reload, expect, press
+[[booking_steps]]
+action = "click"
+selector = "button:has-text('{target_date}')"
+description = "选择七天后的日期"
+
+[[booking_steps]]
+action = "click"
+selector = "text={court}"
+description = "选择目标场地"
+
+[[booking_steps]]
+action = "click"
+selector = "text={time_slot}"
+description = "选择目标时段"
+
+[[booking_steps]]
+action = "click"
+selector = "button:has-text('提交订单')"
+description = "提交订单"
+final_submit = true

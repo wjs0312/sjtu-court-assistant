@@ -1,0 +1,81 @@
+[browser]
+headless = false
+slow_mo_ms = 0
+timezone = "Asia/Shanghai"
+channel = "msedge"
+
+[schedule]
+release_time = "12:00:00"
+days_ahead = 7
+open_early_seconds = 300
+refresh_at_release = true
+detail_ready_timeout_ms = 15000
+refresh_navigation_timeout_ms = 5000
+deadline_seconds = 45
+retry_interval_ms = 400
+post_release_refresh_interval_ms = 800
+post_release_max_refreshes = 30
+
+[target]
+venue = "羽毛球馆"
+court = "场地1"
+time_slot = "21:00-22:00"
+time_slot_priority = ["21:00-22:00"]
+court_priority = ["场地1", "场地2", "场地3"]
+
+[site]
+login_url = "https://sports.sjtu.edu.cn/pc/#/"
+booking_url = "https://sports.sjtu.edu.cn/pc/#/"
+detail_url = "https://sports.sjtu.edu.cn/pc/#/apointmentDetails/1/3b10ff47-7e83-4c21-816c-5edc257168c1/%25E7%25BE%25BD%25E6%25AF%259B%25E7%2590%2583/0"
+auth_state = ".auth/state.json"
+session_storage = ".auth/session_storage.json"
+
+[success]
+url_contains = "/pay"
+selector = ""
+text = "待支付"
+stop_after_submit = true
+open_payment_after_submit = true
+
+[login]
+success_selector = ""
+timeout_seconds = 180
+captcha_selector = "input[placeholder*='验证码'], input[aria-label*='验证码']"
+auto_click_text = "校内人员登录"
+
+[[prepare_steps]]
+action = "sjtu_open_detail"
+description = "进入场馆详情"
+timeout_ms = 30000
+
+[[booking_steps]]
+action = "click"
+selector = "text={target_date_cn_zero}"
+description = "选择目标日期"
+
+[[booking_steps]]
+action = "expect"
+selector = "text=拼命加载中"
+state = "hidden"
+timeout_ms = 15000
+description = "等待场地加载"
+
+[[booking_steps]]
+action = "sjtu_select_slot"
+description = "选择目标场地与时段"
+
+[[booking_steps]]
+action = "click"
+selector = "button:has-text('立即下单')"
+description = "打开预订须知"
+
+[[booking_steps]]
+action = "click"
+selector = "text=本人已认真阅读"
+description = "勾选须知"
+
+[[booking_steps]]
+action = "click"
+selector = "button:has-text('提交订单')"
+description = "提交一次订单"
+final_submit = true
